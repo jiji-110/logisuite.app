@@ -1,0 +1,69 @@
+import React from "react";
+
+// Filet de sécurité : si un plantage React survient n'importe où dans
+// l'app, on affiche le message d'erreur exact à l'écran au lieu d'un
+// écran blanc silencieux. Fais une capture de ce que cet écran affiche
+// si ça arrive — ça permet de corriger précisément le point qui coince.
+export default class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { error };
+  }
+
+  componentDidCatch(error, info) {
+    console.error("LogiSuite a rencontré une erreur :", error, info);
+  }
+
+  render() {
+    if (this.state.error) {
+      return (
+        <div
+          style={{
+            minHeight: "100vh",
+            background: "#12161B",
+            color: "#E9E6DF",
+            fontFamily: "monospace",
+            padding: 24,
+            whiteSpace: "pre-wrap",
+          }}
+        >
+          <h2 style={{ color: "#F26D6D" }}>Une erreur est survenue</h2>
+          <p>Fais une capture de ce texte et envoie-le pour qu'on corrige le point exact :</p>
+          <pre
+            style={{
+              background: "#171D23",
+              padding: 16,
+              borderRadius: 6,
+              overflow: "auto",
+              border: "1px solid #262C33",
+            }}
+          >
+            {this.state.error.message}
+            {"\n\n"}
+            {this.state.error.stack}
+          </pre>
+          <button
+            onClick={() => window.location.reload()}
+            style={{
+              marginTop: 16,
+              background: "#FF6A1A",
+              color: "#12161B",
+              border: "none",
+              borderRadius: 6,
+              padding: "10px 16px",
+              fontWeight: 700,
+              cursor: "pointer",
+            }}
+          >
+            Recharger la page
+          </button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}MM
