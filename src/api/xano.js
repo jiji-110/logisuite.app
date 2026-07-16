@@ -5,12 +5,8 @@
 //  - AUTH_BASE  : connexion / inscription / "qui suis-je"
 //  - DATA_BASE  : dépôts, produits, arrêts, tournées, utilisateurs
 //
-// ⚠️ À VÉRIFIER : les noms de segments d'URL ci-dessous (RESOURCES) sont une
-// hypothèse basée sur la façon dont Xano transforme généralement un nom de
-// table accentué en URL (ex: "dépôts" → "depots"). Ouvre la Documentation
-// Swagger de ton groupe "LogiSuite" dans Xano et compare avec les chemins
-// réels affichés là-bas. Si un nom diffère, corrige-le juste ici — rien
-// d'autre dans le code n'a besoin de changer.
+// Les segments d'URL ci-dessous (RESOURCES) ont été confirmés via la
+// Documentation Swagger réelle du groupe "LogiSuite" (2026-07-14).
 // ---------------------------------------------------------------------------
 
 const AUTH_BASE = import.meta.env.VITE_XANO_AUTH_URL || "https://x8ki-letl-twmt.n7.xano.io/api:6TmswaGi";
@@ -18,15 +14,15 @@ const DATA_BASE = import.meta.env.VITE_XANO_DATA_URL || "https://x8ki-letl-twmt.
 
 const RESOURCES = {
   depots: "depots",
-  products: "produits",
-  stops: "arrets",
-  tournees: "tournois",
-  users: "utilisateurs",
+  products: "products",
+  stops: "stops",
+  tournees: "tournees",
+  users: "users",
 };
 
-// Noms possibles sous lesquels Xano peut renvoyer les arrêts liés, selon
-// comment l'addon a été nommé lors de sa création. On essaie chacun.
-const STOPS_ADDON_KEYS = ["arrets", "stops", "_arrets", "_stops", "arrêts"];
+// Confirmé par la Documentation Swagger : GET /tournees renvoie chaque
+// tournée avec un champ "stops" contenant ses arrêts imbriqués.
+const STOPS_ADDON_KEYS = ["stops", "arrets", "_stops", "_arrets", "arrêts"];
 
 const TOKEN_KEY = "logisuite_token";
 
@@ -123,9 +119,10 @@ export const stopsApi = {
   remove: (id) => request(DATA_BASE, `/${RESOURCES.stops}/${id}`, { method: "DELETE" }),
 };
 
-// ---- Utilisateurs (la création passe par authApi.signup, pas par ici) ----
+// ---- Utilisateurs ----
 export const usersApi = {
   list: () => request(DATA_BASE, `/${RESOURCES.users}`),
+  create: (data) => request(DATA_BASE, `/${RESOURCES.users}`, { method: "POST", body: data }),
   update: (id, data) => request(DATA_BASE, `/${RESOURCES.users}/${id}`, { method: "PATCH", body: data }),
   remove: (id) => request(DATA_BASE, `/${RESOURCES.users}/${id}`, { method: "DELETE" }),
 };
