@@ -580,18 +580,13 @@ export default function LogiSuite() {
     });
 
   // ---- équipe ----
-  // Creates a real Xano account (hashed password) via the public signup
-  // endpoint, WITHOUT touching our own session token, then sets the role.
+  // Crée directement un compte via l'endpoint dédié /users (name, email,
+  // password, role en une seule fois) — Xano hache le mot de passe
+  // automatiquement grâce au type de champ "Password" sur cette colonne.
   const createUser = (name, role_, email, password) =>
     withSave(async () => {
-      await authApi.signup(email, password, name);
-      const rawList = await usersApi.list();
-      const match = (rawList || []).find((u) => u.email === email);
-      if (match) {
-        await usersApi.update(match.id, { role: role_ });
-      }
-      const refreshed = await usersApi.list();
-      setUsers((refreshed || []).map(userFromXano));
+      const raw = await usersApi.create({ name, email, password, role: role_ });
+      setUsers((prev) => [...prev, userFromXano(raw)]);
     });
 
   const deleteUser = (id) =>
