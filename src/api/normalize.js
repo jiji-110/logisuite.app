@@ -116,5 +116,13 @@ export function productFromXano(raw) {
 }
 
 export function userFromXano(raw) {
-  return { id: String(raw.id), name: raw.name || raw.email, email: raw.email, role: raw.role || "chauffeur" };
+  let role = raw.role || "chauffeur";
+  // Le champ "role" chez Xano autorise parfois plus de valeurs que ce que
+  // l'app connaît (ex: "admin", "member", restes de gabarits par défaut).
+  // On les ramène vers les deux seuls rôles que l'app comprend, pour éviter
+  // un plantage si une valeur inattendue arrive.
+  if (role === "admin") role = "exploitant";
+  else if (role === "member") role = "chauffeur";
+  else if (role !== "exploitant" && role !== "chauffeur") role = "chauffeur";
+  return { id: String(raw.id), name: raw.name || raw.email, email: raw.email, role };
 }
